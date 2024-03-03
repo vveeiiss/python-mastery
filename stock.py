@@ -1,5 +1,5 @@
 import csv
-import tableformat
+import reader
 
 class Stock:
     types = (str, int, float)
@@ -7,6 +7,10 @@ class Stock:
         self.name = str(name)
         self.shares = int(shares)
         self.price = float(price)
+
+    def __eq__(self, other):
+        return isinstance(other, Stock) and ((self.name, self.shares, self.price) ==
+                                             (other.name, other.shares, other.price))
 
     @property
     def cost(self):
@@ -19,6 +23,9 @@ class Stock:
     def from_row(cls, row):
         values = [func(val) for func, val in zip(cls.types, row)]
         return cls(*values)
+
+    def __repr__(self):
+        return f'{type(self).__name__}({self.name!r}, {self.shares!r}, {self.price!r})'
 
 def read_portfolio(filename):
     port = []
@@ -38,7 +45,10 @@ def print_portfolio(port):
 
 
 s = Stock("AB", 100, 100.0)
-print(s.cost)
-portfolio = read_portfolio('Data/portfolio.csv')
-tableformat.print_table(portfolio, ['name','shares','price'])
+print(s.__repr__())
+a = Stock('GOOG', 100, 490.1)
+b = Stock('GOOG', 100, 490.1)
+print(a == b)
+portfolio = reader.read_csv_as_instances('Data/portfolio.csv', Stock)
+#tableformat.print_table(portfolio, ['name','shares','price'])
 
